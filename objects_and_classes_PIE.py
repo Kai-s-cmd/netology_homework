@@ -9,7 +9,8 @@ class Student:
 
     def rate_lecturer(self, lecturer, course, grade):
         if isinstance(lecturer, Lecturer) \
-                and course in self.courses_in_progress:
+                and course in self.courses_in_progress \
+                and course in lecturer.courses_attached:
             if course in lecturer.grades:
                 lecturer.grades[course] += [grade]
             else:
@@ -21,10 +22,12 @@ class Student:
         self.finished_courses.append(course_name)
 
     def average_rate(self):
+        if not self.grades:
+            return 0
         marks_list = []
         for mark in self.grades.values():
-            marks_list.append(mark)
-            return sum(mark) / len(marks_list[0])
+            marks_list.extend(mark)
+            return sum(marks_list) / len(marks_list)
 
     def __lt__(self, other):
         return self.average_rate() < other.average_rate()
@@ -39,8 +42,8 @@ class Student:
         return f'Имя: {self.name}' \
                f'\nФамилия: {self.surname}' \
                f'\nСредняя оценка за домашние задания: {self.average_rate()}'\
-               f'\nКурсы в процессе изучения: {self.courses_in_progress}' \
-               f'\nЗавершенные курсы: {self.finished_courses}'
+               f'\nКурсы в процессе изучения: {", ".join(self.courses_in_progress)}' \
+               f'\nЗавершенные курсы: {", ".join(self.finished_courses)}'
 
 
 class Mentor:
@@ -56,10 +59,12 @@ class Lecturer(Mentor):
         self.grades = {}
 
     def average_rate(self):
+        if not self.grades:
+            return 0
         marks_list = []
         for mark in self.grades.values():
-            marks_list.append(mark)
-            return sum(mark) / len(marks_list[0])
+            marks_list.extend(mark)
+            return sum(marks_list) / len(marks_list)
 
     def __str__(self):
         return f'Имя: {self.name}' \
@@ -90,7 +95,7 @@ class Reviewer(Mentor):
 
     def __str__(self):
         return f'Имя: {self.name}' \
-               f'Фамилия: {self.surname}'
+               f'\nФамилия: {self.surname}'
 
 
 best_student = Student('Ruoy', 'Eman', 'your_gender')
@@ -144,15 +149,15 @@ list_of_students = [best_student, best_student2]
 
 
 def average_rate_all_students(list_of_students, name_of_course):
+    if not isinstance(list_of_students, list):
+        return "Not list"
     average_marks_list = []
     for student in list_of_students:
-        if name_of_course in student.courses_in_progress:
-            average_marks_list.append(student.average_rate())
-        else:
-            return '"Возможно студент еще не закончил курс. ' \
-                   'Или такого курса не существует"'
-    return sum(average_marks_list) / \
-        len(average_marks_list)
+        average_marks_list.extend(student.grades.get(name_of_course, []))
+    if not name_of_course:
+        return "По такому курсу ни у кого нет оценок"
+    return round(sum(average_marks_list) /
+                 len(average_marks_list), 2)
 
 
 print(f"Средняя оценка для студентов "
@@ -165,16 +170,17 @@ list_of_lecturers = [cool_lecturer, cool_lecturer1]
 
 
 def average_rate_all_lecturer(list_of_lecturers, name_of_course_for_lecturer):
+    if not isinstance(list_of_lecturers, list):
+        return "Not list"
     average_marks_list = []
     for lecturer in list_of_lecturers:
-        if name_of_course_for_lecturer in lecturer.courses_attached:
-            average_marks_list.append(lecturer.average_rate())
-        else:
-            return '"Tакого курса не существует"'
-    return sum(average_marks_list) / \
-        len(average_marks_list)
+        average_marks_list.extend(lecturer.grades.get(name_of_course_for_lecturer, []))
+    if not name_of_course_for_lecturer:
+        return "По такому курсу ни у кого нет оценок"
+    return round(sum(average_marks_list) /
+                 len(average_marks_list), 2)
 
 
 print(f"Средняя оценка для лекторов "
       f"{average_rate_all_lecturer(list_of_lecturers, name_of_course_for_lecturer)}"
-      f" по курсу {name_of_course}")
+      f" по курсу {name_of_course_for_lecturer}")
