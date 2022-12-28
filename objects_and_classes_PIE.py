@@ -27,7 +27,7 @@ class Student:
         marks_list = []
         for mark in self.grades.values():
             marks_list.extend(mark)
-            return sum(marks_list) / len(marks_list)
+        return sum(marks_list) / len(marks_list)
 
     def __lt__(self, other):
         return self.average_rate() < other.average_rate()
@@ -64,7 +64,7 @@ class Lecturer(Mentor):
         marks_list = []
         for mark in self.grades.values():
             marks_list.extend(mark)
-            return sum(marks_list) / len(marks_list)
+        return sum(marks_list) / len(marks_list)
 
     def __str__(self):
         return f'Имя: {self.name}' \
