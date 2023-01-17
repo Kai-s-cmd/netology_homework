@@ -1,4 +1,3 @@
-import os
 import requests
 from pprint import pprint
 from token_yandex import TOKEN
@@ -46,4 +45,4 @@ if __name__ == '__main__':
     path_to_file = 'superhero_api.py'
     token = TOKEN
     uploader = YaUploader()
-    result = uploader.upload(os.path.join(path_to_file))
+    result = uploader.upload(path_to_file)
